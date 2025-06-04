@@ -1,0 +1,101 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    
+    background: linear-gradient(135deg, #312A77, #822EA4, #D332D0,#E96AE7,#796CFF);
+    min-height: 100vh; 
+    margin: 0;
+  }
+  
+
+  .hero {
+    background-color: transparent;
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+  }
+  
+  .hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .hero .buttons {
+    margin-bottom: 20px;
+  }
+  
+  .hero .btn {
+    background-color: white;
+    color: #4f46e5;
+    padding: 12px 24px;
+    margin: 0 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  
+  .hero .btn:hover {
+    background-color: #e0e0ff;
+  }
+  
+  .hero .btn-outline {
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+  }
+  
+  .hero .btn-outline:hover {
+    background-color: white;
+    color: #4f46e5;
+  }
+  
+  .download-link {
+    color: #fff;
+    text-decoration: underline;
+    font-size: 0.95rem;
+  }
+  
+  
+  footer {
+    text-align: center;
+    padding: 20px;
+    background-color: transparent;
+    margin-top: 50px;
+  }
+  
+ h1, h1.display-4 {
+        font-family: 'Krona One', sans-serif;
+      }
+      
+footer{
+    color: white;
+}
+
+
+.hero-section {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 20px;  
+  padding-bottom: 20px;
+}
+
+
+
+
+
+  
+
+      
