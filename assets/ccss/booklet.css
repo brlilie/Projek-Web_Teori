@@ -1,0 +1,45 @@
+/* Reset dan gaya dasar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+
+    body {
+    background: linear-gradient(135deg, #312A77, #822EA4, #D332D0,#E96AE7,#796CFF);
+    min-height: 100vh; 
+    margin: 0;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+   
+    .btn-dua {
+        display: inline-block;
+        background-color: #312A77;
+        color: white;
+        padding: 15px 80px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: 500;
+        text-align: center;
+        transition: background-color 0.3s ease;
+      }
+      
+      .btn-dua:hover {
+        background: linear-gradient(45deg, #6a11cb, #312A77);
+      }
+
+      .btn-dua {
+        padding: 12px 40px;
+        font-size: 0.95rem;
+      }
