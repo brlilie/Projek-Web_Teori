@@ -34,7 +34,7 @@
 
 <section style="background: #FFFFFF;">
 <h2 style="text-align: center;">User Interface dan User Experience Design</h2>
-    <div class="card">
+<div class="card" style="background-color: #333; color: white;"> 
             <div class="content-container">
                 <div class="poster">
                 <img src="poster.png" alt="Poster Lomba" />
@@ -55,47 +55,40 @@
 </section>
 
 <section style="background: #FFFFFF;">
-<h2 style="text-align: center;">Lomba Cerdas Cermat</h2>
-    <div class="card">
-            <div class="content-container">
-                <div class="poster">
-                <img src="poster.png" alt="Poster Lomba" />
-                </div>
-                <div class="cen-layout">
-                        <div class="info">
-                            <h3>Deskripsi Lomba</h3>
-                            <p>Detail lomba, jadwal, dan hadiah.</p>
-                            <h3>Ketentuan Lomba</h3>
-                            <p>lorem ipsum dolor sit amet</p>
-                            <h3>Tanggal Pendaftaran</h3>
-                            <p>lorem ipsum dolor sit amet</p>
-                        </div>
-                        <a href="daftar_lomba.php" class="btn-next">Daftar Sekarang</a>
-                </div>
-            </div>
-    </div>
-</section>
+  <h2 style="text-align: center;">Cyber Security</h2>
+  <div class="card" style="background-color: #333; color: white;"> 
+    <div class="content-container">
+      <div class="poster">
+        <img src="poster.png" alt="Poster Lomba" />
+      </div>
+      <div class="cen-layout">
+        <div class="info">
+          <h3>Deskripsi Lomba</h3>
+          <p>
+            Lomba Cyber Security merupakan ajang kompetisi yang dirancang untuk menguji kemampuan peserta dalam mengidentifikasi, menganalisis, dan menangani ancaman keamanan siber. Peserta akan dihadapkan pada berbagai studi kasus dan simulasi serangan siber untuk menguji pengetahuan teknis dan strategis mereka di bidang keamanan informasi. Lomba ini terbuka bagi pelajar, mahasiswa, maupun umum yang memiliki minat dan keahlian di bidang teknologi dan keamanan digital.
+          </p>
 
-<section style="background: #FFFFFF;">
-<h2 style="text-align: center;">Cyber Security</h2>
-    <div class="card">
-            <div class="content-container">
-                <div class="poster">
-                <img src="poster.png" alt="Poster Lomba" />
-                </div>
-                <div class="cen-layout">
-                        <div class="info">
-                            <h3>Deskripsi Lomba</h3>
-                            <p>Detail lomba, jadwal, dan hadiah.</p>
-                            <h3>Ketentuan Lomba</h3>
-                            <p>lorem ipsum dolor sit amet</p>
-                            <h3>Tanggal Pendaftaran</h3>
-                            <p>lorem ipsum dolor sit amet</p>
-                        </div>
-                        <a href="daftar_lomba.php" class="btn-next">Daftar Sekarang</a>
-                </div>
-            </div>
+          <h3>Ketentuan Lomba</h3>
+          <ul style="color: white;">
+            <li>Peserta dapat mengikuti lomba secara individu atau tim (maksimal 3 orang).</li>
+            <li>Peserta wajib membawa laptop pribadi dengan perangkat lunak yang telah ditentukan panitia.</li>
+            <li>Setiap peserta harus menyelesaikan tantangan dalam waktu yang telah ditentukan.</li>
+            <li>Plagiarisme atau kerja sama antar tim yang tidak sah akan didiskualifikasi.</li>
+            <li>Keputusan dewan juri bersifat mutlak dan tidak dapat diganggu gugat.</li>
+          </ul>
+
+          <h3>Tanggal Pendaftaran</h3>
+          <p>
+            Pembukaan Pendaftaran: 10 Juni 2025<br>
+            Penutupan Pendaftaran: 25 Juni 2025<br>
+            Pengumuman Peserta Lolos Seleksi: 28 Juni 2025<br>
+            Pelaksanaan Lomba: 1 Juli 2025
+          </p>
+        </div>
+        <a href="daftar_lomba.php" class="btn-next">Daftar Sekarang</a>
+      </div>
     </div>
+  </div>
 </section>
 
 
