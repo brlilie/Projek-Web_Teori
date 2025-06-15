@@ -1,3 +1,15 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit;
+}
+?>
+<?php
+require_once '../config/db.php';
+$result = $conn->query("SELECT * FROM daftar_lomba ORDER BY created_at DESC");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,33 +106,53 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                            <?php if ($result->num_rows > 0): ?>
+                                <?php $no = 1; ?>
+                                <?php while ($row = $result->fetch_assoc()): ?>
                                     <tr>
-                                        <td>1</td>
-                                        <td>Desain Poster Kreatif</td>
-                                        <td>Desain</td>
-                                        <td>2025-07-15</td>
-                                        <td><span class="badge bg-success">Aktif</span></td>
+                                        <td><?= $no++ ?></td>
+                                        <td><?= htmlspecialchars($row['judul_lomba']) ?></td>
+                                        <td><?= ucfirst($row['kategori']) ?></td>
+                                        <td><?= $row['deadline_pendaftaran'] ?></td>
                                         <td>
-                                            <button type="button" class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" data-bs-target="#lombaFormModal" data-id="1" data-judul="Desain Poster Kreatif" data-deskripsi="Deskripsi lomba desain poster..." data-ketentuan="Ketentuan desain..." data-mulai="2025-07-01" data-selesai="2025-07-15" data-deadline="2025-07-10" data-penyelenggara="Komunitas Kreatif" data-hadiah="Uang Tunai" data-link="https://link-desain.com" data-kategori="desain" data-poster="poster-desain.jpg">
+                                            <?php
+                                                // Logika status aktif: jika deadline belum lewat
+                                                $today = date('Y-m-d');
+                                                $status = ($row['deadline_pendaftaran'] >= $today) ? 'Aktif' : 'Tutup';
+                                                $badgeClass = ($status === 'Aktif') ? 'bg-success' : 'bg-secondary';
+                                            ?>
+                                            <span class="badge <?= $badgeClass ?>"><?= $status ?></span>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-warning btn-sm me-1"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#lombaFormModal"
+                                                data-id="<?= $row['id_lomba'] ?>"
+                                                data-judul="<?= htmlspecialchars($row['judul_lomba'], ENT_QUOTES) ?>"
+                                                data-deskripsi="<?= htmlspecialchars($row['deskripsi'], ENT_QUOTES) ?>"
+                                                data-ketentuan="<?= htmlspecialchars($row['ketentuan'], ENT_QUOTES) ?>"
+                                                data-mulai="<?= $row['tanggal_mulai'] ?>"
+                                                data-selesai="<?= $row['tanggal_selesai'] ?>"
+                                                data-deadline="<?= $row['deadline_pendaftaran'] ?>"
+                                                data-penyelenggara="<?= htmlspecialchars($row['penyelenggara'], ENT_QUOTES) ?>"
+                                                data-hadiah="<?= htmlspecialchars($row['hadiah'], ENT_QUOTES) ?>"
+                                                data-kategori="<?= $row['kategori'] ?>"
+                                                data-poster="<?= $row['poster_lomba'] ?>"
+                                            >
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
-                                            <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus lomba ini?')"><i class="fas fa-trash"></i> Hapus</a>
+                                            <a href="../proses/hapus_lomba.php?id=<?= $row['id_lomba'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus lomba ini?')">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </a>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Lomba Menulis Cerpen</td>
-                                        <td>Penulisan</td>
-                                        <td>2025-06-30</td>
-                                        <td><span class="badge bg-success">Aktif</span></td>
-                                        <td>
-                                            <button type="button" class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" data-bs-target="#lombaFormModal" data-id="2" data-judul="Lomba Menulis Cerpen" data-deskripsi="Deskripsi lomba cerpen..." data-ketentuan="Ketentuan cerpen..." data-mulai="2025-06-15" data-selesai="2025-06-30" data-deadline="2025-06-25" data-penyelenggara="Pena Muda" data-hadiah="Beasiswa" data-link="https://link-cerpen.com" data-kategori="penulisan" data-poster="poster-cerpen.jpg">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </button>
-                                            <a href="#" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus lomba ini?')"><i class="fas fa-trash"></i> Hapus</a>
-                                        </td>
-                                    </tr>
-                                    </tbody>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="6" class="text-center">Belum ada lomba yang ditambahkan.</td>
+                                </tr>
+                            <?php endif; ?>
+                            </tbody>
                             </table>
                         </div>
                     </div>
@@ -136,8 +168,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="lombaForm" action="../proses/upload_lomba_proses.php" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="lomba_id" id="lomba_id"> <div class="mb-3">
+                        <form id="lombaForm" action="" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="form_mode" id="form_mode" value="tambah"> 
+                            <input type="hidden" name="id_lomba" id="lomba_id">
+                            <input type="hidden" name="current_poster" id="current_poster">
+
                             <label for="judul_lomba" class="form-label">Judul Lomba</label>
                             <input type="text" class="form-control" id="judul_lomba" name="judul_lomba" required>
                         </div>
@@ -172,24 +207,18 @@
                             <input type="text" class="form-control" id="hadiah" name="hadiah">
                         </div>
                         <div class="mb-3">
-                            <label for="link_pendaftaran" class="form-label">Link Pendaftaran</label>
-                            <input type="url" class="form-control" id="link_pendaftaran" name="link_pendaftaran" placeholder="Contoh: https://form.google.com/lomba">
-                        </div>
-                        <div class="mb-3">
                             <label for="kategori" class="form-label">Kategori</label>
                             <select class="form-select" id="kategori" name="kategori" required>
                                 <option value="" disabled selected>Pilih Kategori</option>
                                 <option value="desain">Desain</option>
-                                <option value="penulisan">Penulisan</option>
-                                <option value="olahraga">Olahraga</option>
-                                <option value="sains">Sains</option>
+                                <option value="it">IT</option>
+                                <option value="cyber">Cyber</option>
                                 </select>
                         </div>
                         <div class="mb-3">
                             <label for="poster_lomba" class="form-label">Poster Lomba</label>
                             <input class="form-control" type="file" id="poster_lomba" name="poster_lomba" accept="image/*">
                             <small class="text-muted" id="current_poster_text">Poster saat ini: -</small>
-                            <input type="hidden" name="current_poster" id="current_poster">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -203,68 +232,61 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById("sidebarToggle").addEventListener("click", function() {
-            document.getElementById("wrapper").classList.toggle("toggled");
-        });
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("sidebarToggle").addEventListener("click", function () {
+        document.getElementById("wrapper").classList.toggle("toggled");
+    });
 
-        // JavaScript untuk menangani modal form (mengisi data saat mode edit)
-        var lombaFormModal = document.getElementById('lombaFormModal');
-        lombaFormModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget; // Tombol yang memicu modal
-            var modalTitle = lombaFormModal.querySelector('.modal-title');
-            var form = lombaFormModal.querySelector('#lombaForm');
-            var submitBtn = lombaFormModal.querySelector('#submitFormBtn');
+    const lombaFormModal = document.getElementById('lombaFormModal');
 
-            // Reset form saat modal dibuka (untuk memastikan form bersih jika dibuka dari tombol 'Tambah')
+    lombaFormModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const form = document.getElementById('lombaForm');
+        const modalTitle = lombaFormModal.querySelector('.modal-title');
+        const submitBtn = lombaFormModal.querySelector('#submitFormBtn');
+
+        const isEdit = button && button.hasAttribute('data-id');
+
+        if (isEdit) {
+            // Mode Edit
+            form.action = "../proses/update_lomba_proses.php";
+            form.querySelector('#form_mode').value = 'edit';
+            modalTitle.textContent = 'Edit Lomba';
+            submitBtn.textContent = 'Update Lomba';
+
+            form.querySelector('#lomba_id').value = button.getAttribute('data-id');
+            form.querySelector('#judul_lomba').value = button.getAttribute('data-judul');
+            form.querySelector('#deskripsi').value = button.getAttribute('data-deskripsi');
+            form.querySelector('#ketentuan').value = button.getAttribute('data-ketentuan');
+            form.querySelector('#tanggal_mulai').value = button.getAttribute('data-mulai');
+            form.querySelector('#tanggal_selesai').value = button.getAttribute('data-selesai');
+            form.querySelector('#deadline_pendaftaran').value = button.getAttribute('data-deadline');
+            form.querySelector('#penyelenggara').value = button.getAttribute('data-penyelenggara');
+            form.querySelector('#hadiah').value = button.getAttribute('data-hadiah');
+            form.querySelector('#kategori').value = button.getAttribute('data-kategori');
+
+            const poster = button.getAttribute('data-poster');
+            if (poster && poster !== 'null') {
+                form.querySelector('#current_poster_text').innerText = 'Poster saat ini: ' + poster;
+                form.querySelector('#current_poster').value = poster;
+            } else {
+                form.querySelector('#current_poster_text').innerText = 'Poster saat ini: Belum ada';
+                form.querySelector('#current_poster').value = '';
+            }
+        } else {
+            // Mode Tambah
             form.reset();
-            lombaFormModal.querySelector('#lomba_id').value = '';
-            lombaFormModal.querySelector('#current_poster_text').innerText = 'Poster saat ini: -';
-            lombaFormModal.querySelector('#current_poster').value = '';
+            form.action = "../proses/upload_lomba_proses.php";
+            form.querySelector('#form_mode').value = 'tambah';
+            form.querySelector('#lomba_id').value = '';
+            form.querySelector('#current_poster_text').innerText = 'Poster saat ini: -';
+            form.querySelector('#current_poster').value = '';
             modalTitle.textContent = 'Tambah Lomba Baru';
             submitBtn.textContent = 'Simpan Lomba';
-
-
-            // Cek apakah tombol yang diklik adalah tombol 'Edit'
-            if (button.hasAttribute('data-id')) {
-                modalTitle.textContent = 'Edit Lomba';
-                submitBtn.textContent = 'Update Lomba';
-
-                // Ambil data dari atribut data-* tombol
-                var id = button.getAttribute('data-id');
-                var judul = button.getAttribute('data-judul');
-                var deskripsi = button.getAttribute('data-deskripsi');
-                var ketentuan = button.getAttribute('data-ketentuan');
-                var mulai = button.getAttribute('data-mulai');
-                var selesai = button.getAttribute('data-selesai');
-                var deadline = button.getAttribute('data-deadline');
-                var penyelenggara = button.getAttribute('data-penyelenggara');
-                var hadiah = button.getAttribute('data-hadiah');
-                var link = button.getAttribute('data-link');
-                var kategori = button.getAttribute('data-kategori');
-                var poster = button.getAttribute('data-poster'); // Nama file poster saat ini
-
-                // Isi form dengan data
-                lombaFormModal.querySelector('#lomba_id').value = id;
-                lombaFormModal.querySelector('#judul_lomba').value = judul;
-                lombaFormModal.querySelector('#deskripsi').value = deskripsi;
-                lombaFormModal.querySelector('#ketentuan').value = ketentuan;
-                lombaFormModal.querySelector('#tanggal_mulai').value = mulai;
-                lombaFormModal.querySelector('#tanggal_selesai').value = selesai;
-                lombaFormModal.querySelector('#deadline_pendaftaran').value = deadline;
-                lombaFormModal.querySelector('#penyelenggara').value = penyelenggara;
-                lombaFormModal.querySelector('#hadiah').value = hadiah;
-                lombaFormModal.querySelector('#link_pendaftaran').value = link;
-                lombaFormModal.querySelector('#kategori').value = kategori;
-                if (poster && poster !== 'null') { // Pastikan poster tidak null
-                    lombaFormModal.querySelector('#current_poster_text').innerText = 'Poster saat ini: ' + poster;
-                    lombaFormModal.querySelector('#current_poster').value = poster;
-                } else {
-                    lombaFormModal.querySelector('#current_poster_text').innerText = 'Poster saat ini: Belum ada';
-                    lombaFormModal.querySelector('#current_poster').value = '';
-                }
-            }
-        });
-    </script>
-    <script src="../assets/js/script.js"></script>
+        }
+    });
+});
+</script>
+<script src="../assets/js/script.js"></script>
 </body>
 </html>
