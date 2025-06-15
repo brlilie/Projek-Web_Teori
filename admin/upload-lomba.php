@@ -175,7 +175,6 @@ $result = $conn->query("SELECT * FROM daftar_lomba ORDER BY created_at DESC");
 
                             <label for="judul_lomba" class="form-label">Judul Lomba</label>
                             <input type="text" class="form-control" id="judul_lomba" name="judul_lomba" required>
-                        </div>
                         <div class="mb-3">
                             <label for="deskripsi" class="form-label">Deskripsi Lomba</label>
                             <textarea class="form-control" id="deskripsi" name="deskripsi" rows="5" required></textarea>
