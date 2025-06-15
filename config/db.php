@@ -1,7 +1,11 @@
 <?php
-$koneksi = mysqli_connect("localhost", "root", "", "lombain");
+$host = "localhost";
+$user = "root";
+$password = "";
+$dbname = "lombain"; /
+$conn = new mysqli($host, $user, $password, $dbname);
 
-if (!$koneksi) {
-    die("Koneksi gagal: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 ?>
