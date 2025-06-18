@@ -18,7 +18,7 @@ if ($_POST['form_mode'] === 'tambah') {
     if (!empty($_FILES['poster_lomba']['name'])) {
         $poster_name = $_FILES['poster_lomba']['name'];
         $poster_tmp = $_FILES['poster_lomba']['tmp_name'];
-        $poster_path = 'uploads/poster/' . $poster_name;
+        $poster_path = 'assets/images/' . $poster_name;
 
         move_uploaded_file($poster_tmp, '../' . $poster_path);
     }
