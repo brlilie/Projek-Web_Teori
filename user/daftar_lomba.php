@@ -1,3 +1,16 @@
+
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: ../login.php");
+    exit;
+}
+?>
+<?php
+require_once('../config/db.php');
+$kategoriQuery = mysqli_query($conn, "SELECT id_lomba, judul_lomba FROM daftar_lomba");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +30,7 @@
 <?php require_once('../layout/navbar.php'); ?>
   <section>
     <div class="card-transparent">
-        <form action="submit.php" method="post" enctype="multipart/form-data" class="form-pendaftaran">
+    <form action="../proses/daftar_proses.php" method="post" enctype="multipart/form-data" class="form-pendaftaran">
     <h2>Form Pendaftaran Lomba</h2>
 
     <label for="nama_tim">Nama Tim</label>
@@ -36,13 +49,14 @@
     <input type="tel" id="whatsapp" name="whatsapp" required>
 
     <label for="kategori">Kategori Lomba</label>
-    <select id="kategori" name="kategori" required>
+    <select id="kategori" name="id_lomba" required>
         <option value="">-- Pilih Kategori --</option>
-        <option value="uiux">UI/UX</option>
-        <option value="poster">Poster</option>
-        <option value="video">Video</option>
+        <?php while($kategori = mysqli_fetch_assoc($kategoriQuery)): ?>
+            <option value="<?= $kategori['id_lomba'] ?>">
+                <?= htmlspecialchars($kategori['judul_lomba']) ?>
+            </option>
+        <?php endwhile; ?>
     </select>
-
     <label for="bukti_pembayaran">Upload Bukti Pembayaran (PDF/JPG/PNG)</label>
     <input type="file" id="bukti_pembayaran" name="bukti_pembayaran" accept=".pdf,.jpg,.jpeg,.png" required>
 
