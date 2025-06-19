@@ -1,142 +1,188 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: ../login.php");
+    exit;
+}
+
+require_once '../config/db.php';
+
+$id_lomba = isset($_GET['id_lomba']) && $_GET['id_lomba'] != 0 ? (int)$_GET['id_lomba'] : null;
+
+// Ambil semua daftar lomba untuk dropdown
+$lomba_result = mysqli_query($conn, "SELECT id_lomba, judul_lomba FROM daftar_lomba");
+
+// Ambil data pendaftar
+$sql = "
+    SELECT p.*, l.judul_lomba
+    FROM pendaftar p
+    JOIN daftar_lomba l ON p.id_lomba = l.id_lomba
+";
+
+if ($id_lomba) {
+    $sql .= " WHERE p.id_lomba = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id_lomba);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+} else {
+    $result = mysqli_query($conn, $sql);
+}
+if (!$result) {
+    die("Query error: " . mysqli_error($conn));
+}
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftar - Admin LombaApps</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <style> /* Styling serupa dengan dashboard untuk konsistensi */
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <style>
         body { background-color: #f8f9fa; }
         #wrapper { display: flex; }
-        #sidebar-wrapper { /* ... (paste CSS dari dashboard.php) ... */
-            min-height: 100vh; margin-left: -15rem; transition: margin .25s ease-out;
-            background: linear-gradient(180deg, #8A2BE2, #EE82EE); color: white;
-            width: 15rem; position: fixed; z-index: 1000;
+
+        #sidebar-wrapper {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #8A2BE2, #EE82EE);
+            color: white;
+            width: 15rem;
+            position: fixed;
         }
-        #sidebar-wrapper .sidebar-heading { padding: 1.0rem 1.25rem; font-size: 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: bold; }
-        #sidebar-wrapper .list-group { width: 100%; }
-        #sidebar-wrapper .list-group-item { color: white; background-color: transparent; border: none; padding: 0.8rem 1.25rem; transition: background-color 0.2s ease; }
-        #sidebar-wrapper .list-group-item:hover { background-color: rgba(255, 255, 255, 0.2); color: white; }
-        #page-content-wrapper { min-width: 100vw; margin-left: 15rem; }
-        .navbar-toggler { border-color: rgba(255, 255, 255, 0.1); }
-        .navbar-toggler-icon { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); }
-        @media (min-width: 768px) {
-            #sidebar-wrapper { margin-left: 0; }
-            #page-content-wrapper { min-width: 0; width: 100%; }
-            #wrapper.toggled #sidebar-wrapper { margin-left: -15rem; }
+
+        #sidebar-wrapper .list-group-item {
+            color: white;
+            background-color: transparent;
+            border: none;
+        }
+
+        #sidebar-wrapper .list-group-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #page-content-wrapper {
+            margin-left: 15rem;
+            width: 100%;
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: -15rem;
+            transition: margin 0.3s ease;
+        }
+
+        #wrapper.toggled #page-content-wrapper {
+            margin-left: 0;
+            transition: margin 0.3s ease;
+        }
+
+        #sidebar-wrapper,
+        #page-content-wrapper {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <div class="d-flex" id="wrapper">
-        <div class="bg-light border-right" id="sidebar-wrapper">
-            <div class="sidebar-heading">Admin Panel</div>
-            <div class="list-group list-group-flush">
-                <a href="dashboard.php" class="list-group-item list-group-item-action">
-                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                </a>
-                <a href="upload-lomba.php" class="list-group-item list-group-item-action">
-                    <i class="fas fa-trophy me-2"></i> Kelola Lomba
-                </a>
-                <a href="upload-booklet.php" class="list-group-item list-group-item-action">
-                    <i class="fas fa-book me-2"></i> Kelola Booklet
-                </a>
-                <a href="data-pendaftar.php" class="list-group-item list-group-item-action active">
-                    <i class="fas fa-users me-2"></i> Kelola Pendaftar
-                </a>
-                <a href="../logout.php" class="list-group-item list-group-item-action">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                </a>
-            </div>
+<div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <div class="sidebar-heading p-3 fw-bold">Admin Panel</div>
+        <div class="list-group list-group-flush">
+            <a href="dashboard.php" class="list-group-item list-group-item-action">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+            <a href="upload-lomba.php" class="list-group-item list-group-item-action">
+                <i class="fas fa-trophy me-2"></i> Kelola Lomba
+            </a>
+            <a href="upload-booklet.php" class="list-group-item list-group-item-action">
+                <i class="fas fa-book me-2"></i> Kelola Booklet
+            </a>
+            <a href="data-pendaftar.php" class="list-group-item list-group-item-action active">
+                <i class="fas fa-users me-2"></i> Kelola Pendaftar
+            </a>
+            <a href="../logout.php" class="list-group-item list-group-item-action">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
         </div>
-        <div id="page-content-wrapper">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-                <div class="container-fluid">
-                    <button class="btn btn-primary" id="sidebarToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                            <li class="nav-item active">
-                                <a class="nav-link" href="#">Halo, Admin!</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+    </div>
 
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
             <div class="container-fluid">
-                <h1 class="mt-4 mb-4">Data Pendaftar Lomba</h1>
-                <p>Pilih lomba untuk melihat daftar pendaftar:</p>
-                <div class="mb-3">
-                    <select class="form-select" id="selectLomba">
-                        <option selected disabled>Pilih Lomba...</option>
-                        <option value="1">Desain Poster Kreatif</option>
-                        <option value="2">Lomba Menulis Cerpen</option>
-                        <option value="3">Turnamen E-sports Valorant</option>
+                <button class="btn btn-primary" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="ms-auto">Halo, Admin!</div>
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-4">
+            <h1 class="mb-4">Data Pendaftar Lomba</h1>
+            <form method="GET" class="mb-3 row">
+                <div class="col-md-6">
+                    <select class="form-select" name="id_lomba" onchange="this.form.submit()">
+                        <option value="0">Semua Lomba</option>
+                        <?php while ($row = mysqli_fetch_assoc($lomba_result)): ?>
+                            <option value="<?= $row['id_lomba'] ?>" <?= ($id_lomba == $row['id_lomba']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($row['judul_lomba']) ?>
+                            </option>
+                        <?php endwhile; ?>
                     </select>
                 </div>
+            </form>
 
-                <div class="card shadow-sm border-0 mt-4">
-                    <div class="card-header bg-primary text-white">
-                        Daftar Pendaftar untuk Lomba [Nama Lomba]
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
+            <div class="card shadow-sm border-0 mt-3">
+                <div class="card-header bg-primary text-white">
+                    Daftar Pendaftar <?= $id_lomba ? 'untuk Lomba ID ' . htmlspecialchars($id_lomba) : '' ?>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama Tim</th>
+                                    <th>Institusi</th>
+                                    <th>Nama Ketua</th>
+                                    <th>Email</th>
+                                    <th>WhatsApp</th>
+                                    <th>Lomba</th>
+                                    <th>Bukti Pembayaran</th>
+                                    <th>Tanggal Daftar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $no = 1; while ($row = mysqli_fetch_assoc($result)) : ?>
                                     <tr>
-                                        <th>#</th>
-                                        <th>Nama Peserta</th>
-                                        <th>Email</th>
-                                        <th>Tanggal Daftar</th>
-                                        <th>Status Pendaftaran</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Budi Santoso</td>
-                                        <td>budi@example.com</td>
-                                        <td>2025-06-01</td>
-                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td><?= $no++ ?></td>
+                                        <td><?= htmlspecialchars($row['nama_tim']) ?></td>
+                                        <td><?= htmlspecialchars($row['institusi']) ?></td>
+                                        <td><?= htmlspecialchars($row['nama_ketua']) ?></td>
+                                        <td><?= htmlspecialchars($row['email']) ?></td>
+                                        <td><?= htmlspecialchars($row['whatsapp']) ?></td>
+                                        <td><?= htmlspecialchars($row['judul_lomba']) ?></td>
                                         <td>
-                                            <button class="btn btn-success btn-sm me-1"><i class="fas fa-check"></i> Terima</button>
-                                            <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i> Tolak</button>
+                                            <a href="../assets/pembayaran/<?= urlencode($row['bukti_pembayaran']) ?>" target="_blank">Lihat</a>
                                         </td>
+                                        <td><?= htmlspecialchars($row['tanggal_daftar']) ?></td>
                                     </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Citra Dewi</td>
-                                        <td>citra@example.com</td>
-                                        <td>2025-06-02</td>
-                                        <td><span class="badge bg-success">Diterima</span></td>
-                                        <td>
-                                            <button class="btn btn-info btn-sm me-1"><i class="fas fa-info-circle"></i> Detail</button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                            </table>
-                        </div>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById("sidebarToggle").addEventListener("click", function() {
-            document.getElementById("wrapper").classList.toggle("toggled");
-        });
-        // Contoh sederhana untuk mengubah judul tabel berdasarkan pilihan lomba (ini masih statis, akan dinamis dengan PHP)
-        document.getElementById("selectLomba").addEventListener("change", function() {
-            const selectedLomba = this.options[this.selectedIndex].text;
-            document.querySelector(".card-header").innerText = "Daftar Pendaftar untuk Lomba " + selectedLomba;
-        });
-    </script>
-    <script src="../assets/js/script.js"></script>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById("sidebarToggle").addEventListener("click", function () {
+        document.getElementById("wrapper").classList.toggle("toggled");
+    });
+</script>
 </body>
 </html>
